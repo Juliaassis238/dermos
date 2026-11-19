@@ -4,11 +4,11 @@
 
 create extension if not exists pgcrypto;
 
-enum app_role as ('owner', 'doctor', 'assistant', 'reception', 'finance');
-enum encounter_status as ('draft', 'signed', 'cancelled');
-enum appointment_status as ('scheduled', 'confirmed', 'waiting', 'completed', 'cancelled', 'no_show');
-enum lesion_status as ('active', 'monitoring', 'resolved');
-enum attachment_kind as ('exam', 'clinical_photo', 'consent', 'other');
+create type public.app_role as enum ('owner', 'doctor', 'assistant', 'reception', 'finance');
+create type public.encounter_status as enum ('draft', 'signed', 'cancelled');
+create type public.appointment_status as enum ('scheduled', 'confirmed', 'waiting', 'completed', 'cancelled', 'no_show');
+create type public.lesion_status as enum ('active', 'monitoring', 'resolved');
+create type public.attachment_kind as enum ('exam', 'clinical_photo', 'consent', 'other');
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,

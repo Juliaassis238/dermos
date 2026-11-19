@@ -12,7 +12,9 @@ function SectionTitle({ eyebrow, title, action }: { eyebrow: string; title: stri
 function PatientCard({ p, onClick }: { p: typeof patients[number]; onClick: () => void }) { return <button className="patient-list-card" onClick={onClick}><span className="patient-avatar" style={{background:p.tone}}>{p.initials}</span><span><b>{p.name}</b><small>{p.detail}</small></span><MoreHorizontal size={16}/></button>; }
 
 export default function Home() {
-  const [view, setView] = useState<View>("dashboard"); const [sideOpen, setSideOpen] = useState(false); const [patient, setPatient] = useState(patients[0]);
+  const requestedView = new URLSearchParams(window.location.search).get("view") as View | null;
+  const validViews: View[] = ["dashboard", "patients", "record", "photos", "lesions", "prescription", "exams", "agenda"];
+  const [view, setView] = useState<View>(requestedView && validViews.includes(requestedView) ? requestedView : "dashboard"); const [sideOpen, setSideOpen] = useState(false); const [patient, setPatient] = useState(patients[0]);
   const go = (v: View) => { setView(v); setSideOpen(false); };
   const titles: Record<View, string> = { dashboard: "Visão geral", patients: "Pacientes", record: "Prontuário", photos: "Fotos clínicas", lesions: "Mapa de lesões", prescription: "Prescrições", exams: "Exames e anexos", agenda: "Agenda" };
   return <main className="dermos-pro"><div className="product-bar"><span><span className="product-dot"/> DERMOS <i>prontuário dermatológico</i></span><div className="demo-switch"><span>Protótipo visual</span><span className="safe-chip"><ShieldCheck size={13}/> Dados fictícios</span></div></div><div className="app-shell">
