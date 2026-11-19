@@ -1,170 +1,39 @@
 import { useMemo, useState } from "react";
-import { ArrowUpRight, ChevronDown, Menu, Sparkles, Stethoscope, X } from "lucide-react";
+import { CalendarDays, ChevronDown, ClipboardList, FileText, FolderOpen, LayoutDashboard, Menu, MessageSquare, Search, Settings, ShieldCheck, Stethoscope, UserRound, Users, X } from "lucide-react";
 
-type Concept = {
-  id: string;
-  number: string;
-  name: string;
-  movement: string;
-  palette: string;
-  image: string;
-  eyebrow: string;
-  title: string;
-  body: string;
-  accent: string;
-  ink: string;
-  surface: string;
-  soft: string;
-  font: string;
-};
-
-const concepts: Concept[] = [
-  {
-    id: "editorial",
-    number: "01",
-    name: "Editorial de cuidado",
-    movement: "Revista de saúde + intimidade",
-    palette: "Marfim · terracota · café",
-    image: "/manus-storage/async-images/qfH07dGV8hVZ1CPqlFYBBK/image-1.webp",
-    eyebrow: "Dermatologia para cada história",
-    title: "Cuidar da pele começa por escutar.",
-    body: "Ciência, humanidade e diversidade em uma prática dermatológica individualizada.",
-    accent: "#b65d45",
-    ink: "#2d2925",
-    surface: "#f5f0e8",
-    soft: "#e9ddd1",
-    font: "editorial",
-  },
-  {
-    id: "botanica",
-    number: "02",
-    name: "Botânica clínica",
-    movement: "Naturalidade com precisão",
-    palette: "Areia · sálvia · grafite",
-    image: "/manus-storage/async-images/qfH07dGV8hVZ1CPqlFYBBK/image-2.webp",
-    eyebrow: "Uma prática que une",
-    title: "Conhecimento para acompanhar cada fase.",
-    body: "Um cuidado atento aos detalhes, ao tempo e às particularidades de cada pele.",
-    accent: "#66725f",
-    ink: "#27302b",
-    surface: "#f1eee6",
-    soft: "#dce2d6",
-    font: "botanica",
-  },
-  {
-    id: "melanina",
-    number: "03",
-    name: "Melanina em foco",
-    movement: "Diversidade como eixo",
-    palette: "Ébano · âmbar · blush",
-    image: "/manus-storage/async-images/qfH07dGV8hVZ1CPqlFYBBK/image-3.webp",
-    eyebrow: "Pele negra é conhecimento",
-    title: "Uma dermatologia que reconhece as particularidades.",
-    body: "Experiência, pesquisa e cuidado para tratar cada pele com atenção ao que a torna única.",
-    accent: "#d08a53",
-    ink: "#2a1d1b",
-    surface: "#f3e8df",
-    soft: "#ead0bd",
-    font: "melanina",
-  },
-  {
-    id: "mineral",
-    number: "04",
-    name: "Clareza mineral",
-    movement: "Precisão serena",
-    palette: "Azul mineral · branco · carvão",
-    image: "/manus-storage/async-images/qfH07dGV8hVZ1CPqlFYBBK/image-4.webp",
-    eyebrow: "Dermatologia baseada em evidência",
-    title: "Um plano de cuidado que faz sentido.",
-    body: "Investigação, orientação e acompanhamento para decisões mais claras sobre a sua pele.",
-    accent: "#7398a7",
-    ink: "#213038",
-    surface: "#edf2f1",
-    soft: "#dce9eb",
-    font: "mineral",
-  },
-  {
-    id: "noite",
-    number: "05",
-    name: "Noite essencial",
-    movement: "Luxo discreto + naturalidade",
-    palette: "Vinho · marrom · champagne",
-    image: "/manus-storage/async-images/qfH07dGV8hVZ1CPqlFYBBK/image-5.webp",
-    eyebrow: "Estética com naturalidade",
-    title: "Valorizar sem apagar quem você é.",
-    body: "Procedimentos planejados para respeitar anatomia, proporções e diferentes fases da vida.",
-    accent: "#b59b6e",
-    ink: "#f5ede5",
-    surface: "#251c1b",
-    soft: "#49302d",
-    font: "noite",
-  },
+type Theme = { id: string; name: string; accent: string; bg: string; panel: string; ink: string; muted: string; font: string };
+const themes: Theme[] = [
+  { id: "editorial", name: "Editorial", accent: "#ae604d", bg: "#f5f0e8", panel: "#fffaf2", ink: "#2d2925", muted: "#887d73", font: "serif" },
+  { id: "botanica", name: "Botânica", accent: "#637962", bg: "#edf0e8", panel: "#f9fbf5", ink: "#263129", muted: "#788279", font: "sans" },
+  { id: "melanina", name: "Melanina", accent: "#c68151", bg: "#f1e6dd", panel: "#fff7f0", ink: "#321f1d", muted: "#896d61", font: "serif" },
+  { id: "mineral", name: "Mineral", accent: "#5b8b9b", bg: "#edf2f2", panel: "#fbfefe", ink: "#23343a", muted: "#74878d", font: "sans" },
+  { id: "noite", name: "Noite", accent: "#c7a76c", bg: "#241b1a", panel: "#302423", ink: "#f5ede4", muted: "#b1a09a", font: "serif" },
 ];
-
-const areas = [
-  ["01", "Dermatologia clínica", "Acne, manchas, melasma, dermatites, psoríase e rosácea."],
-  ["02", "Pele negra", "Particularidades da pigmentação, inflamação, cicatrizes e alopecias."],
-  ["03", "Cabelos", "Investigação da queda de cabelo e das doenças do couro cabeludo."],
-  ["04", "Estética com naturalidade", "Planejamento individualizado, anatomia e resultados coerentes."],
+const patients = [
+  { initials: "AS", name: "Ana Souza", age: "29 anos", tag: "Retorno", color: "#bd8d79" },
+  { initials: "MC", name: "Marina Costa", age: "42 anos", tag: "Primeira consulta", color: "#8b9f84" },
+  { initials: "JP", name: "João Pereira", age: "36 anos", tag: "Acompanhamento", color: "#8c9fad" },
+  { initials: "LR", name: "Luiza Ribeiro", age: "24 anos", tag: "Retorno", color: "#b58d98" },
 ];
 
 export default function Home() {
-  const initialConcept = new URLSearchParams(window.location.search).get("concept");
-  const [activeId, setActiveId] = useState(concepts.some((concept) => concept.id === initialConcept) ? initialConcept! : "editorial");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const active = useMemo(() => concepts.find((concept) => concept.id === activeId) ?? concepts[0], [activeId]);
-
-  return (
-    <main className={`site-shell theme-${active.font}`} style={{ "--accent": active.accent, "--ink": active.ink, "--surface": active.surface, "--soft": active.soft } as React.CSSProperties}>
-      <div className="concept-ribbon">
-        <span>Direções visuais · escolha um caminho</span>
-        <div className="concept-switcher">
-          {concepts.map((concept) => (
-            <button key={concept.id} className={concept.id === active.id ? "is-active" : ""} onClick={() => setActiveId(concept.id)} aria-label={`Selecionar conceito ${concept.number}`}>
-              <span>{concept.number}</span>{concept.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <section className="hero">
-        <nav className="nav">
-          <a className="wordmark" href="#top" onClick={() => setMenuOpen(false)}><span>Mariana Gil</span><small>Dermatologia</small></a>
-          <div className={`nav-links ${menuOpen ? "open" : ""}`}>
-            <a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre</a>
-            <a href="#areas" onClick={() => setMenuOpen(false)}>Áreas de atuação</a>
-            <a href="#conteudo" onClick={() => setMenuOpen(false)}>Conteúdo</a>
-            <a href="#contato" onClick={() => setMenuOpen(false)}>Contato</a>
-          </div>
-          <a className="nav-cta" href="#contato">Agendar consulta <ArrowUpRight size={15} /></a>
-          <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}>{menuOpen ? <X size={20} /> : <Menu size={20} />}</button>
-        </nav>
-
-        <div className="hero-grid" id="top">
-          <div className="hero-copy">
-            <p className="kicker"><span className="kicker-line" />{active.eyebrow}</p>
-            <h1>{active.title}</h1>
-            <p className="hero-body">{active.body}</p>
-            <div className="hero-actions"><a className="button-primary" href="#contato">Conheça meu trabalho <ArrowUpRight size={17} /></a><a className="button-quiet" href="#areas">Explorar áreas <ChevronDown size={17} /></a></div>
-            <div className="hero-meta"><span>São Paulo · particular</span><span>Presencial e teleconsulta</span></div>
-          </div>
-          <div className="hero-art"><div className="image-frame"><img src={active.image} alt="Imagem editorial abstrata da direção visual selecionada" /><div className="image-note">{active.number} / 05<br /><span>{active.name}</span></div></div><div className="art-orbit" /></div>
-        </div>
-      </section>
-
-      <section className="marquee"><span>Ciência</span><i>·</i><span>Humanidade</span><i>·</i><span>Diversidade</span><i>·</i><span>Cuidado individualizado</span></section>
-
-      <section className="intro section" id="sobre"><div className="section-label">01 / Uma prática que une</div><div className="intro-grid"><h2>Escuta antes de indicar. <em>Conhecimento antes de prometer.</em></h2><div><p>Minha trajetória na saúde começou antes da Medicina, na Enfermagem e na Saúde Pública. Hoje, uno a dermatologia clínica aos procedimentos estéticos de forma individualizada.</p><p>Meu objetivo é oferecer uma dermatologia baseada em evidência científica, escuta e cuidado individualizado — para que cada pessoa compreenda sua pele e encontre um tratamento que faça sentido para sua história.</p><a className="text-link" href="#contato">Conheça minha trajetória <ArrowUpRight size={16} /></a></div></div></section>
-
-      <section className="areas section" id="areas"><div className="section-label">02 / Áreas de atuação</div><div className="areas-head"><h2>Dermatologia para diferentes <em>necessidades e fases da vida.</em></h2><p>Da saúde da pele aos cuidados estéticos, cada tratamento começa por uma avaliação individualizada.</p></div><div className="area-list">{areas.map(([number, title, copy]) => <a href="#contato" className="area-row" key={number}><span>{number}</span><h3>{title}</h3><p>{copy}</p><ArrowUpRight size={21} /></a>)}</div></section>
-
-      <section className="quote-band"><Sparkles size={19} /><p>“Estética não deve apagar características ou transformar rostos, mas acompanhar cada pessoa em suas diferentes fases da vida.”</p><span>— Mariana Gil Furlanetti</span></section>
-
-      <section className="content section" id="conteudo"><div className="section-label">03 / Conteúdo</div><div className="content-head"><h2>Informação para cuidar <em>melhor da sua pele.</em></h2><a className="text-link" href="#contato">Ver todos os conteúdos <ArrowUpRight size={16} /></a></div><div className="content-grid"><article><div className="article-art art-one" /><small>PELE NEGRA · 06 MIN</small><h3>Por que a pele negra precisa de uma dermatologia atenta à pigmentação?</h3></article><article><div className="article-art art-two" /><small>CABELOS · 04 MIN</small><h3>Queda de cabelo: quando investigar e quais perguntas fazer.</h3></article><article><div className="article-art art-three" /><small>ESTÉTICA · 05 MIN</small><h3>Naturalidade também é um resultado planejado.</h3></article></div></section>
-
-      <section className="contact section" id="contato"><div className="contact-card"><div><div className="section-label">04 / Agendamento</div><h2>Vamos cuidar da sua pele?</h2><p>O primeiro passo é uma consulta individualizada para entender sua pele, suas necessidades e seus objetivos.</p></div><div className="contact-actions"><a className="button-primary" href="https://wa.me/5511999999999">Falar pelo WhatsApp <ArrowUpRight size={17} /></a><div className="contact-details"><span>Av. Paulista, 1048 · 18º andar</span><span>Bela Vista · São Paulo, SP</span></div></div></div></section>
-
-      <footer><a className="wordmark" href="#top"><span>Mariana Gil</span><small>Dermatologia</small></a><span>Ciência, escuta e cuidado individualizado.</span><span>© 2026 · São Paulo</span></footer>
-    </main>
-  );
+  const initial = new URLSearchParams(window.location.search).get("theme");
+  const [themeId, setThemeId] = useState(themes.some(t => t.id === initial) ? initial! : "editorial");
+  const [selected, setSelected] = useState(0);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useMemo(() => themes.find(t => t.id === themeId)!, [themeId]);
+  const patient = patients[selected];
+  return <main className={`dermos theme-${theme.font}`} style={{ "--accent": theme.accent, "--bg": theme.bg, "--panel": theme.panel, "--ink": theme.ink, "--muted": theme.muted } as React.CSSProperties}>
+    <div className="theme-bar"><span>DermOS · direções visuais do prontuário</span><div>{themes.map(t => <button className={t.id === themeId ? "active" : ""} onClick={() => setThemeId(t.id)} key={t.id}>{t.name}</button>)}</div></div>
+    <div className="app-shell">
+      <aside className={mobileOpen ? "sidebar open" : "sidebar"}><div className="brand"><span className="brand-mark">D</span><span><b>DermOS</b><small>gestão & prontuário</small></span><button onClick={() => setMobileOpen(false)} className="close-menu"><X size={17}/></button></div><div className="profile"><div className="avatar">MG</div><div><b>Mariana Gil</b><small>Dermatologista</small></div><ChevronDown size={15}/></div><nav><a className="nav-active"><LayoutDashboard size={17}/>Visão geral</a><a><Users size={17}/>Pacientes <span>248</span></a><a><CalendarDays size={17}/>Agenda</a><a><ClipboardList size={17}/>Protocolos</a><a><FileText size={17}/>Documentos</a></nav><div className="sidebar-bottom"><a><MessageSquare size={17}/>Mensagens <span className="dot"/></a><a><Settings size={17}/>Configurações</a><div className="privacy"><ShieldCheck size={17}/><span>Ambiente privado<br/><small>Último backup hoje, 03:00</small></span></div></div></aside>
+      <section className="workspace"><header className="topbar"><button className="mobile-menu" onClick={() => setMobileOpen(true)}><Menu size={21}/></button><div className="crumb"><span>Visão geral</span><i>/</i><b>Consultório</b></div><div className="top-actions"><button><Search size={17}/></button><button className="bell">●</button><div className="mini-avatar">MG</div></div></header>
+        <div className="content"><div className="heading"><div><p className="eyebrow">QUARTA-FEIRA · 19 DE NOVEMBRO, 2026</p><h1>Bom dia, Mariana.</h1><p className="sub">Aqui está o resumo do seu consultório hoje.</p></div><button className="primary"><span>+</span> Novo atendimento</button></div>
+        <div className="metrics"><div className="metric"><span>Consultas hoje</span><b>08</b><small className="up">↑ 12% <em>vs. semana passada</em></small></div><div className="metric"><span>Pacientes ativos</span><b>248</b><small>12 novos este mês</small></div><div className="metric"><span>Retornos pendentes</span><b>14</b><small className="attention">Requer atenção</small></div><div className="metric"><span>Próximo horário</span><b>14:30</b><small>Marina Costa · retorno</small></div></div>
+        <div className="grid-main"><section className="card schedule"><div className="card-head"><div><p className="eyebrow">AGENDA DE HOJE</p><h2>Próximos atendimentos</h2></div><button className="small-link">Ver agenda <span>→</span></button></div>{[["09:00","Ana Souza","Retorno · melasma","AS"],["10:30","João Pereira","Primeira consulta","JP"],["14:30","Marina Costa","Retorno · queda de cabelo","MC"],["16:00","Luiza Ribeiro","Acompanhamento","LR"]].map((item, i) => <div className={`appointment ${i === 2 ? "current" : ""}`} key={item[0]}><time>{item[0]}</time><div className="line"/><div className="patient-avatar" style={{background: patients[i].color}}>{item[3]}</div><div className="appointment-info"><b>{item[1]}</b><span>{item[2]}</span></div>{i === 2 && <span className="now">próximo</span>}</div>)}</section>
+        <section className="card patient-card"><div className="card-head"><div><p className="eyebrow">PACIENTE RECENTE</p><h2>Ficha rápida</h2></div><button className="more">···</button></div><div className="patient-hero"><div className="big-avatar" style={{background: patient.color}}>{patient.initials}</div><div><h3>{patient.name}</h3><p>{patient.age} · CPF ***.***.***-**</p><span>{patient.tag}</span></div></div><div className="patient-fields"><div><small>Última consulta</small><b>12 nov 2026</b></div><div><small>Próximo retorno</small><b>14 dez 2026</b></div><div><small>Condição principal</small><b>Melasma</b></div></div><button className="outline">Abrir prontuário <span>→</span></button></section></div>
+        <section className="bottom-grid"><div className="card quick"><div className="card-head"><div><p className="eyebrow">ACESSO RÁPIDO</p><h2>Continuar de onde parou</h2></div></div><div className="quick-list"><button onClick={() => setSelected((selected + 1) % patients.length)}><FolderOpen size={19}/><span><b>Prontuários recentes</b><small>4 pacientes atualizados hoje</small></span><span>→</span></button><button><FileText size={19}/><span><b>Rascunhos de evolução</b><small>2 registros aguardando revisão</small></span><span>→</span></button></div></div><div className="card privacy-card"><ShieldCheck size={21}/><div><p className="eyebrow">SEGURANÇA</p><h3>Seus dados estão protegidos</h3><p>Todos os acessos são registrados e as fotografias ficam em armazenamento privado.</p></div><span className="status">Ativo</span></div></section>
+        </div></section>
+    </div>
+  </main>;
 }

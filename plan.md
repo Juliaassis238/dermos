@@ -1,20 +1,21 @@
-# DermOS / Mariana Gil — direções visuais
+# DermOS — direções visuais do sistema de prontuário
 
 ## Contexto
-Cinco conceitos de site para comparação visual, alinhados ao posicionamento público da Dra. Mariana Gil: dermatologia baseada em evidências, escuta, diversidade, pele negra, cabelos e estética com naturalidade.
+Cinco conceitos de interface para um sistema privado de gestão e prontuário médico da Dra. Mariana Gil. O protótipo usa somente dados fictícios e serve para escolher a direção visual antes de conectar autenticação, banco, armazenamento e integrações.
 
 ## Conceitos
-1. **Editorial de cuidado** — marfim, terracota e serif editorial; humano, tátil e sofisticado.
-2. **Botânica clínica** — areia, sálvia e grafite; naturalidade com precisão.
-3. **Melanina em foco** — espresso, âmbar e blush; diversidade como eixo visual.
-4. **Clareza mineral** — azul mineral, branco e grafite; científico, calmo e contemporâneo.
-5. **Noite essencial** — marrom profundo, vinho e champagne; luxo discreto e intimista.
+1. **Editorial** — marfim e terracota; acolhedor, sofisticado e legível.
+2. **Botânica** — areia e sálvia; naturalidade com precisão.
+3. **Melanina** — blush, âmbar e espresso; identidade e diversidade.
+4. **Mineral** — azul clínico e branco; clareza, foco e sensação de segurança.
+5. **Noite** — marrom profundo e champagne; discreto, premium e intimista.
 
-## Implementação
-A página inicial é uma galeria funcional de cinco conceitos com navegação, seleção de direção visual e CTAs demonstrativos. A estrutura de conteúdo já separa áreas de atuação, tratamentos, conteúdo e contato, deixando pontos de extensão para Supabase. O site não usa dados médicos reais.
+## Escopo visual do protótipo
+A tela inicial é um dashboard de consultório com menu lateral, perfil da médica, visão geral, métricas, agenda do dia, ficha rápida de paciente, acesso a prontuários recentes, rascunhos de evolução e status de segurança. O seletor superior alterna os cinco conceitos para comparação.
 
-## Base técnica
+## Base técnica planejada
 - React + TypeScript + Vite.
-- Componentes responsivos e acessíveis.
-- Imagens editoriais geradas para os mockups e referenciadas por URLs gerenciadas.
-- Publicação compatível com Vercel/GitHub; banco e armazenamento reais ficam para uma segunda etapa, quando o escopo funcional for aprovado.
+- Interface responsiva para desktop e celular.
+- Dados demonstrativos sem informações reais de pacientes.
+- Pontos de extensão para Supabase Auth, Database e Storage.
+- Futura implementação: pacientes, prontuário estruturado e texto livre, fotografias privadas, permissões por perfil, auditoria e backups.
