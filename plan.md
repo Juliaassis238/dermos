@@ -1,21 +1,23 @@
-# DermOS — direções visuais do sistema de prontuário
+# DermOS — prontuário dermatológico digital
 
-## Contexto
-Cinco conceitos de interface para um sistema privado de gestão e prontuário médico da Dra. Mariana Gil. O protótipo usa somente dados fictícios e serve para escolher a direção visual antes de conectar autenticação, banco, armazenamento e integrações.
+## Objetivo
+Criar um sistema privado para gestão do consultório e prontuário dermatológico da Dra. Mariana Gil. O protótipo usa dados fictícios e demonstra a arquitetura de navegação antes da conexão com Supabase.
 
-## Conceitos
-1. **Editorial** — marfim e terracota; acolhedor, sofisticado e legível.
-2. **Botânica** — areia e sálvia; naturalidade com precisão.
-3. **Melanina** — blush, âmbar e espresso; identidade e diversidade.
-4. **Mineral** — azul clínico e branco; clareza, foco e sensação de segurança.
-5. **Noite** — marrom profundo e champagne; discreto, premium e intimista.
+## Módulos demonstrados
+- Dashboard com métricas, agenda do dia, paciente recente, atividade e segurança.
+- Pacientes com busca, status, última consulta e próximo retorno.
+- Prontuário com resumo clínico, fototipo, alergias, medicações, evolução e linha do tempo.
+- Fotos clínicas com comparação antes/depois e organização por região.
+- Mapa corporal de lesões com topografia, morfologia, tamanho e status.
+- Prescrição digital com rascunho, itens, posologia, histórico e etapa de assinatura.
+- Exames e anexos com categorias, status e área de upload.
+- Agenda com consultas e resumo mensal.
 
-## Escopo visual do protótipo
-A tela inicial é um dashboard de consultório com menu lateral, perfil da médica, visão geral, métricas, agenda do dia, ficha rápida de paciente, acesso a prontuários recentes, rascunhos de evolução e status de segurança. O seletor superior alterna os cinco conceitos para comparação.
+## Direção visual
+A interface combina editorial médico, tons de pele, controles discretos, tipografia com serif de alto contraste e uma paleta acolhedora. O foco é reduzir carga cognitiva sem parecer um sistema hospitalar genérico.
 
-## Base técnica planejada
-- React + TypeScript + Vite.
-- Interface responsiva para desktop e celular.
-- Dados demonstrativos sem informações reais de pacientes.
-- Pontos de extensão para Supabase Auth, Database e Storage.
-- Futura implementação: pacientes, prontuário estruturado e texto livre, fotografias privadas, permissões por perfil, auditoria e backups.
+## Arquitetura futura
+GitHub privado mantém o código; Vercel publica o frontend; Supabase fornece Auth, PostgreSQL, Storage privado e RLS. O schema inicial está em `supabase/schema.sql`. Integrações com Clinovi, Memed, WhatsApp, pagamentos e assinatura dependem de APIs, contratos, consentimento e validação técnica.
+
+## Limites
+O protótipo não armazena dados reais, não emite receita válida, não assina documentos e não deve ser usado em produção clínica sem revisão de segurança, privacidade, operação e requisitos profissionais.

@@ -1,16 +1,21 @@
 # DermOS — entregas
 
-## Mockups do sistema
-- [x] Apresentar cinco direções de interface para o sistema de prontuário.
-- [x] Dashboard de consultório com agenda, pacientes, métricas e segurança.
-- [x] Dados exclusivamente fictícios para demonstração.
-- [x] Alternância entre conceitos sem recarregar a página.
+## Protótipo visual e navegável
+- [x] Dashboard de consultório com métricas, agenda e atividade recente.
+- [x] Cadastro/listagem demonstrativa de pacientes com busca e status.
+- [x] Prontuário com resumo clínico, fototipo, alergias, medicações e linha do tempo.
+- [x] Fotos clínicas com comparação evolutiva antes/depois.
+- [x] Mapa corporal com registros de lesões e status de acompanhamento.
+- [x] Prescrição digital em modo rascunho, com posologia e histórico.
+- [x] Exames e anexos com categorias e estados.
+- [x] Agenda com consultas do dia e resumo mensal.
+- [x] Navegação responsiva para desktop e celular.
+- [x] Aviso visual de dados fictícios no protótipo.
 
-## Próximos módulos funcionais
-- [ ] Login e autenticação por perfil.
-- [ ] Cadastro, busca e histórico de pacientes.
-- [ ] Prontuário com campos estruturados e evolução em texto livre.
-- [ ] Fotografias em armazenamento privado com permissões.
-- [ ] Agenda e integração posterior com Clinovi, se houver API autorizada.
-- [ ] Auditoria de acessos, backups testados e política de retenção.
-- [ ] Integração futura com Memed, condicionada à API e ao contrato.
+## Próximas etapas técnicas
+- [ ] Conectar Supabase Auth e perfis de acesso.
+- [ ] Migrar pacientes, consultas, evoluções e agenda para PostgreSQL.
+- [ ] Configurar Storage privado para fotos e anexos com URLs temporárias.
+- [ ] Implementar RLS revisada, auditoria de acessos, backups e restauração testada.
+- [ ] Validar fluxo de prescrição e assinatura digital com os requisitos aplicáveis.
+- [ ] Avaliar APIs e contratos do Clinovi, Memed, WhatsApp e pagamentos.
