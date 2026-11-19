@@ -192,3 +192,11 @@ create policy audit_logs_read on public.audit_logs for select using (public.curr
 
 -- Permite o primeiro cadastro da profissional após o sign-up do Supabase Auth.
 create policy profiles_insert_self on public.profiles for insert with check (id = auth.uid());
+
+
+-- Arquivos clínicos privados: fotos, laudos e documentos não são públicos.
+insert into storage.buckets (id, name, public) values ('clinical-files', 'clinical-files', false) on conflict (id) do update set public = false;
+create policy clinical_files_select on storage.objects for select to authenticated using (bucket_id = 'clinical-files');
+create policy clinical_files_insert on storage.objects for insert to authenticated with check (bucket_id = 'clinical-files');
+create policy clinical_files_update on storage.objects for update to authenticated using (bucket_id = 'clinical-files') with check (bucket_id = 'clinical-files');
+create policy clinical_files_delete on storage.objects for delete to authenticated using (bucket_id = 'clinical-files');
