@@ -188,3 +188,7 @@ create policy audit_logs_read on public.audit_logs for select using (public.curr
 
 -- Bucket privado sugerido: clinical-files. Criar pelo Dashboard/Storage e aplicar políticas
 -- baseadas em auth.uid(), patient_id e profile role; não tornar público.
+
+
+-- Permite o primeiro cadastro da profissional após o sign-up do Supabase Auth.
+create policy profiles_insert_self on public.profiles for insert with check (id = auth.uid());
