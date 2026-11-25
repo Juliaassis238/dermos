@@ -18,7 +18,7 @@
 - [x] Corrigir permissões `EXECUTE` dos helpers RLS e retirar a autoelevação de perfil; perfil owner de Mariana foi provisionado após confirmação explícita.
 - [x] Corrigir Site URL e Redirect URL do Supabase para `https://dermos.pages.dev`; a configuração foi recarregada e conferida, mas um novo link de confirmação ainda não foi testado ponta a ponta.
 - [ ] Validar login real da proprietária, link de confirmação/recuperação e sessão expirada. Não solicitar nem armazenar senha no chat.
-- [ ] Publicar a revisão do código no Cloudflare Pages e conferir o site live. Cloudflare está ligado ao repositório e publica automaticamente a branch `main`; o workflow de GitHub Actions foi convertido para apenas validar e não publicar outra cópia.
+- [x] Publicar a revisão no Cloudflare Pages e conferir o site live. O deployment de produção do commit `b0781bd69954ecc14b5a1414a99d3bda8492babc` terminou com build e deploy `success`; `https://dermos.pages.dev` foi testado no navegador, e cadastro/remoção de paciente fictício passaram no modo de teste, sem linha correspondente no Supabase. O workflow de GitHub Actions valida sem publicar uma segunda cópia.
 
 ## Módulos e prontidão de produção
 - [ ] “Deixe essa sistema 100% funcional” — auditar e conectar os módulos além de cadastro/agenda/anexos. Mensagens e financeiro são apenas locais e não persistem; Configurações não executa ações.
