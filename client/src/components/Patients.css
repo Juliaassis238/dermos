@@ -1,0 +1,88 @@
+.patient-table .table-row {
+  grid-template-columns: 2.1fr 1.1fr 1.1fr 0.9fr 76px;
+}
+
+.patient-table--reception .table-row,
+.patient-table--reception .table-head {
+  grid-template-columns: 2.1fr 1.7fr 0.9fr 76px;
+}
+
+.patient-table .patient-static {
+  cursor: default;
+}
+
+.patient-table .patient-contact {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.patient-table .patient-contact span {
+  overflow-wrap: anywhere;
+}
+
+.patient-table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.patient-table-actions .icon-button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+}
+
+.patient-table-actions .patient-delete-icon:hover,
+.patient-table-actions .patient-delete-icon:focus-visible {
+  color: #8e3f3b;
+}
+
+.patient-delete-backdrop {
+  z-index: 1200;
+}
+
+.patient-delete-confirmation {
+  width: min(520px, 100%);
+}
+
+.patient-delete-confirmation > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 12px 0 20px;
+}
+
+.patient-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(86, 64, 53, 0.11);
+  padding-top: 18px;
+}
+
+.patient-delete-confirm-button {
+  background: #8e3f3b !important;
+}
+
+@media (max-width: 720px) {
+  .patient-table .table-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .patient-table--reception .table-head {
+    display: none;
+  }
+
+  .patient-table-actions {
+    gap: 0;
+  }
+
+  .patient-delete-actions > button {
+    flex: 1;
+  }
+}

@@ -149,15 +149,20 @@ create index attachments_patient_idx on public.attachments(patient_id, created_a
 create index audit_logs_resource_idx on public.audit_logs(resource_type, resource_id, occurred_at desc);
 
 -- Helper functions for RLS. Review with the responsible security/privacy professional.
-create or replace function public.current_role() returns app_role
+create or replace function public.current_role() returns public.app_role
 language sql stable security definer set search_path = public as $$
   select role from public.profiles where id = auth.uid() and active = true limit 1;
 $$;
 
 create or replace function public.can_read_clinical_data() returns boolean
 language sql stable security definer set search_path = public as $$
-  select public.current_role() in ('owner', 'doctor', 'assistant');
+  select coalesce(public.current_role() in ('owner', 'doctor', 'assistant'), false);
 $$;
+
+revoke all on function public.current_role() from public, anon;
+revoke all on function public.can_read_clinical_data() from public, anon;
+grant execute on function public.current_role() to authenticated;
+grant execute on function public.can_read_clinical_data() to authenticated;
 
 alter table public.profiles enable row level security;
 alter table public.patients enable row level security;
@@ -169,34 +174,96 @@ alter table public.prescriptions enable row level security;
 alter table public.prescription_items enable row level security;
 alter table public.audit_logs enable row level security;
 
-create policy profiles_self_read on public.profiles for select using (id = auth.uid());
-create policy patients_clinical_read on public.patients for select using (public.can_read_clinical_data());
-create policy patients_clinical_write on public.patients for all using (public.current_role() in ('owner', 'doctor', 'assistant')) with check (public.current_role() in ('owner', 'doctor', 'assistant'));
-create policy appointments_read on public.appointments for select using (public.current_role() is not null);
-create policy appointments_write on public.appointments for all using (public.current_role() in ('owner', 'doctor', 'assistant', 'reception')) with check (public.current_role() in ('owner', 'doctor', 'assistant', 'reception'));
-create policy encounters_read on public.encounters for select using (public.can_read_clinical_data());
-create policy encounters_write on public.encounters for all using (public.current_role() in ('owner', 'doctor')) with check (public.current_role() in ('owner', 'doctor'));
-create policy lesions_read on public.lesions for select using (public.can_read_clinical_data());
-create policy lesions_write on public.lesions for all using (public.current_role() in ('owner', 'doctor')) with check (public.current_role() in ('owner', 'doctor'));
-create policy attachments_read on public.attachments for select using (public.can_read_clinical_data());
-create policy attachments_write on public.attachments for all using (public.current_role() in ('owner', 'doctor', 'assistant')) with check (public.current_role() in ('owner', 'doctor', 'assistant'));
-create policy prescriptions_read on public.prescriptions for select using (public.current_role() in ('owner', 'doctor', 'assistant'));
-create policy prescriptions_write on public.prescriptions for all using (public.current_role() in ('owner', 'doctor')) with check (public.current_role() in ('owner', 'doctor'));
-create policy prescription_items_read on public.prescription_items for select using (public.current_role() in ('owner', 'doctor', 'assistant'));
-create policy prescription_items_write on public.prescription_items for all using (public.current_role() in ('owner', 'doctor')) with check (public.current_role() in ('owner', 'doctor'));
-create policy audit_logs_read on public.audit_logs for select using (public.current_role() = 'owner');
+-- Client grants are explicit. RLS then limits those operations by active profile role.
+revoke all on table public.profiles from anon, authenticated;
+grant select, insert, update on table public.profiles to authenticated;
+revoke all on table public.patients from anon, authenticated;
+grant select, insert, update on table public.patients to authenticated;
+revoke all on table public.appointments from anon, authenticated;
+grant select, insert, update on table public.appointments to authenticated;
+revoke all on table public.encounters from anon, authenticated;
+grant select, insert on table public.encounters to authenticated;
+revoke all on table public.lesions from anon, authenticated;
+grant select, insert on table public.lesions to authenticated;
+revoke all on table public.attachments from anon, authenticated;
+grant select, insert on table public.attachments to authenticated;
+revoke all on table public.prescriptions from anon, authenticated;
+grant select, insert on table public.prescriptions to authenticated;
+revoke all on table public.prescription_items from anon, authenticated;
+grant select, insert on table public.prescription_items to authenticated;
+revoke all on table public.audit_logs from anon, authenticated;
+grant select on table public.audit_logs to authenticated;
 
--- Bucket privado sugerido: clinical-files. Criar pelo Dashboard/Storage e aplicar políticas
--- baseadas em auth.uid(), patient_id e profile role; não tornar público.
+create policy profiles_self_read on public.profiles for select to authenticated using (id = (select auth.uid()));
+create policy profiles_owner_read on public.profiles for select to authenticated using ((select public.current_role()) = 'owner'::public.app_role);
+create policy profiles_owner_insert_staff on public.profiles for insert to authenticated with check (
+  (select public.current_role()) = 'owner'::public.app_role and role <> 'owner'::public.app_role and id <> (select auth.uid())
+);
+create policy profiles_owner_update_staff on public.profiles for update to authenticated using (
+  (select public.current_role()) = 'owner'::public.app_role and id <> (select auth.uid())
+) with check (
+  (select public.current_role()) = 'owner'::public.app_role and id <> (select auth.uid()) and role <> 'owner'::public.app_role
+);
 
+create policy patients_clinical_read on public.patients for select to authenticated using ((select public.can_read_clinical_data()));
+create policy patients_clinical_insert on public.patients for insert to authenticated with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
+create policy patients_clinical_update on public.patients for update to authenticated using (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+) with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
 
--- Permite o primeiro cadastro da profissional após o sign-up do Supabase Auth.
-create policy profiles_insert_self on public.profiles for insert with check (id = auth.uid());
+create policy appointments_read on public.appointments for select to authenticated using (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
+create policy appointments_insert on public.appointments for insert to authenticated with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
+create policy appointments_update on public.appointments for update to authenticated using (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+) with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
 
+create policy encounters_read on public.encounters for select to authenticated using ((select public.can_read_clinical_data()));
+create policy encounters_insert on public.encounters for insert to authenticated with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role)
+);
+create policy lesions_read on public.lesions for select to authenticated using ((select public.can_read_clinical_data()));
+create policy lesions_insert on public.lesions for insert to authenticated with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role)
+);
+create policy attachments_read on public.attachments for select to authenticated using ((select public.can_read_clinical_data()));
+create policy attachments_insert on public.attachments for insert to authenticated with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
+create policy prescriptions_read on public.prescriptions for select to authenticated using (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
+create policy prescriptions_insert on public.prescriptions for insert to authenticated with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role)
+);
+create policy prescription_items_read on public.prescription_items for select to authenticated using (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
+create policy prescription_items_insert on public.prescription_items for insert to authenticated with check (
+  (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role)
+);
+create policy audit_logs_read on public.audit_logs for select to authenticated using ((select public.current_role()) = 'owner'::public.app_role);
 
--- Arquivos clínicos privados: fotos, laudos e documentos não são públicos.
-insert into storage.buckets (id, name, public) values ('clinical-files', 'clinical-files', false) on conflict (id) do update set public = false;
-create policy clinical_files_select on storage.objects for select to authenticated using (bucket_id = 'clinical-files');
-create policy clinical_files_insert on storage.objects for insert to authenticated with check (bucket_id = 'clinical-files');
-create policy clinical_files_update on storage.objects for update to authenticated using (bucket_id = 'clinical-files') with check (bucket_id = 'clinical-files');
-create policy clinical_files_delete on storage.objects for delete to authenticated using (bucket_id = 'clinical-files');
+-- Clinical files remain private and client-side write access is limited to upload-only.
+insert into storage.buckets (id, name, public) values ('clinical-files', 'clinical-files', false)
+on conflict (id) do update set public = false;
+create policy clinical_files_select on storage.objects for select to authenticated using (
+  bucket_id = 'clinical-files' and (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+);
+create policy clinical_files_insert on storage.objects for insert to authenticated with check (
+  bucket_id = 'clinical-files'
+  and (select public.current_role()) in ('owner'::public.app_role, 'doctor'::public.app_role, 'assistant'::public.app_role)
+  and (storage.foldername(name))[1] = (select auth.uid())::text
+);
+
+-- Do not enable self-service profile creation. Apply the secure owner bootstrap and
+-- reception directory/schedule RPC migrations only for the intended DermOS project.

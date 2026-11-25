@@ -1,31 +1,36 @@
 # DermOS — prontuário dermatológico digital
 
-Este repositório contém um protótipo visual e navegável do DermOS, um sistema privado de gestão e prontuário para dermatologia. A interface usa exclusivamente dados fictícios e demonstra dashboard, pacientes, prontuário, evolução fotográfica, mapa de lesões, prescrições, exames e agenda.
+Aplicação web privada para gestão do consultório dermatológico. A interface usa React, TypeScript e Vite; o ambiente público é o projeto Cloudflare Pages `dermos`, conectado ao repositório GitHub `Juliaassis238/dermos`, branch `main`.
 
-## Stack proposta
+## Backend, acesso e dados
 
-- **Frontend:** React + TypeScript + Vite.
-- **Código:** GitHub privado.
-- **Publicação da interface:** Vercel ou outro host compatível com o build estático.
-- **Backend:** Supabase Auth, PostgreSQL, Storage privado e Row Level Security.
-- **Integrações futuras:** Clinovi, Memed, WhatsApp, assinatura digital e pagamentos, sempre condicionadas à API, contrato e requisitos de cada fornecedor.
+O ambiente clínico usa Supabase Auth, PostgreSQL e Storage com Row Level Security (RLS). A chave publicável pode estar no navegador; chaves `service_role` e outras credenciais administrativas nunca devem ser incluídas no frontend ou no repositório.
 
-GitHub e Vercel publicam o código e a interface. Eles não substituem o banco, o armazenamento privado, a auditoria, os backups ou as políticas de acesso; essa parte fica no Supabase e na operação do sistema.
+O perfil inicial autorizado é `owner` para Mariana Gil. Os papéis clínicos têm acesso clínico conforme as policies. O papel `reception` usa somente views administrativas de contatos e agenda, além de RPCs limitadas para cadastrar/editar contato, arquivar paciente e gerenciar agendamentos. A secretária não recebe leitura direta das tabelas clínicas, das notas da agenda ou do bucket de arquivos. Não há conta de recepção ativa provisionada neste momento; uma usuária Auth separada e o respectivo perfil `reception` precisam ser criados antes do primeiro login dela.
 
-## O que já existe no protótipo
+A ação “excluir paciente” é uma inativação (`active = false`) para retirar o cadastro da lista ativa e preservar prontuário, consultas e arquivos vinculados. Não há exclusão física de histórico clínico por essa ação.
 
-A barra lateral permite navegar pelos módulos. As ações principais são clicáveis e usam dados demonstrativos: abrir paciente, revisar prontuário, visualizar fotos comparativas, registrar lesões, preparar prescrição, consultar exames e abrir agenda.
+## Arquivos clínicos
 
-## Como conectar o Supabase depois da aprovação
+O bucket `clinical-files` é privado. O Supabase limita uploads a 20 MiB por arquivo e aos MIME types PDF, JPEG e PNG. A galeria de fotos e a área de exames usam URLs assinadas temporárias para exibir arquivos a perfis clínicos autorizados. O modo de teste não acessa o Storage.
 
-1. Criar um projeto Supabase em uma conta da contratante.
-2. Executar `supabase/schema.sql` depois de revisar o modelo e as políticas RLS.
-3. Criar o bucket privado de arquivos clínicos; fotos nunca devem ser públicas.
-4. Configurar autenticação, perfis e MFA conforme o nível de risco.
-5. Trocar os dados demonstrativos por queries protegidas e URLs assinadas para anexos.
-6. Configurar backups, restauração testada, logs, alertas e retenção.
-7. Publicar a interface no Vercel usando somente variáveis públicas do Supabase; chaves de serviço ficam exclusivamente no servidor/ambiente seguro.
+## Modo de teste
 
-## Aviso de segurança
+O modo de teste mantém cadastros somente no estado local do app. Os cadastros não são enviados ao Supabase, permanecem durante a navegação interna e desaparecem ao sair ou recarregar a lista. A exclusão de um paciente de teste remove apenas o item da sessão. Evoluções, agenda clínica, imagens, exames, lesões e prescrições não são gravados no Supabase nesse modo.
 
-Este é um protótipo de interface, não um sistema médico pronto para produção. Antes de inserir dados reais é necessário revisar a arquitetura, as políticas RLS, o armazenamento, os backups, a autenticação, os logs, os contratos e o tratamento de dados pessoais sensíveis. A emissão de receitas, inclusive controlados, e qualquer assinatura digital devem passar por validação profissional e requisitos aplicáveis antes de uso real.
+## Build e publicação
+
+```sh
+corepack pnpm install --frozen-lockfile
+corepack pnpm check
+corepack pnpm test
+corepack pnpm build:static
+```
+
+O build gera `dist/public`. O projeto Cloudflare Pages publica a branch `main` com `pnpm build:static`. O workflow de GitHub Actions executa validações; ele não publica uma segunda cópia no GitHub Pages.
+
+## Estado e limites conhecidos
+
+Cadastro, edição e inativação de pacientes, modo de teste com remoção local, controle de acesso por papel, views/RPCs de recepção e validação de anexos têm implementação. Os testes locais não substituem login real nem verificação ponta a ponta com contas clínicas e de recepção.
+
+Mensagens e financeiro continuam como demonstrações locais e não persistem no Supabase. Configurações ainda não têm ações funcionais. Acesso da secretária exige criar a conta Auth e atribuir o perfil `reception`; esse fluxo não é oferecido na tela de login. Backups/restauração, política de retenção, proteção contra senhas comprometidas, revisão dos avisos do Supabase e requisitos operacionais/profissionais precisam ser avaliados antes de uso clínico real. Use apenas dados fictícios no modo de teste.
