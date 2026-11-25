@@ -1,0 +1,1 @@
+window.__MANUS_CONFIG__={"projectId":"TvwAFXeSME5yPmJr4mfn7J","oauthPortalUrl":"https://manus.im","apiUrl":"https://forge.manus.ai","apiBrowserKey":"hsMrTHYdu8fwzu2f4PkCyK"};
